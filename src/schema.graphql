@@ -1,8 +1,13 @@
 type Query {
   info: String!
-  feed: [Link!]!
+  feed(filter: String, skip: Int, take: Int, orderBy: LinkOrderByInput): Feed!
   link(id: ID!): Link
   publication: [Publication]
+}
+
+type Feed {
+  links: [Link!]!
+  count: Int!
 }
 
 type Mutation {
@@ -11,11 +16,12 @@ type Mutation {
   deleteLink(id: ID!): Link
   signup(email: String!, password: String!, name: String!): AuthPayload
   login(email: String!, password: String!): AuthPayload
-  vote(linkID: ID!): Vote
+  vote(linkId: ID!): Vote
 }
 
 type Subscription {
   newLink: Link
+  newVote: Vote
 }
 
 type Link {
@@ -49,4 +55,15 @@ type Publication {
   agency: String!
   sponsors: [String!]
   date: Int!
+}
+
+input LinkOrderByInput {
+  description: Sort
+  url: Sort
+  createdAt: Sort
+}
+
+enum Sort {
+  asc
+  desc
 }

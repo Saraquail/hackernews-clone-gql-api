@@ -1,7 +1,7 @@
 //Tells Prisma you’ll be using SQLite for your database connection
 datasource db {
   provider = "sqlite"
-  url = "file:.dev.db"
+  url = "***"
 }
 
 //Indicates that you want to genenerate Prisma Client
