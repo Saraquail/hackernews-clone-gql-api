@@ -1,58 +1,35 @@
-const { GraphQLServer } = require("graphql-yoga");
+const { GraphQLServer, PubSub } = require("graphql-yoga");
+const { PrismaClient } = require("@prisma/client");
+const Query = require("./resolvers/Query");
+const Mutation = require("./resolvers/Mutation");
+const Subscription = require('./resolvers/Subscription')
+const User = require("./resolvers/User");
+const Link = require("./resolvers/Link");
+const Vote = require('./resolvers/Vote')
 
-//used to store links at runtime in memory
-let links = [
-  {
-    id: "link-0",
-    url: "www.howtographql.com",
-    description: "Fullstack tutorial for GraphQL",
-  },
-];
+const prisma = new PrismaClient();
+const pubsub = new PubSub();
 
-//simple way to implement unique IDs
-let idCount = links.length;
-
-// implementation of GQL schema
-//every GraphQL resolver function actually receives four input arguments
 const resolvers = {
-  Query: {
-    info: () => `This is the API of a Hackernews Clone`,
-    //notide that resolvers must be named after correspoinding field from schema definition
-    feed: () => links,
-    // link: (id) => links.find(link => link.id === id)
-  },
-  Mutation: {
-    // implements post. creates new link, adds to links, returns new link
-    //args contains the values sent by the query
-    createPost: (parent, args) => {
-      const link = {
-        id: `link-${idCount++}`,
-        description: args.description,
-        url: args.url,
-      };
-      links.push(link);
-      return link;
-    },
-    updateLink: (parent, args) => {
-      parent.description = args.description,
-      parent.url = args.url
-      return parent
-    }
-  },
-  // //resolvers for Link type aren't needed bc GraphQL server infers this information in the following way
-  // Link: {
-  //   //parent(or root) is the first of the 4 arguments and is the result of the previous resolver execution level
-  //   //in this case links from the Query resolver
-  //   id: (parent) => parent.id,
-  //   description: (parent) => parent.description,
-  //   url: (parent) => parent.url,
-  // }
+  Query,
+  Mutation,
+  Subscription,
+  User,
+  Link,
+  Vote,
 };
 
 // This tells the server what API operations are accepted and how they should be resolved.
 const server = new GraphQLServer({
   typeDefs: "./src/schema.graphql",
   resolvers,
+  context: (request) => {
+    return {
+      ...request,
+      prisma,
+      pubsub
+    };
+  },
 });
 
 server.start(() => console.log(`Server is running on http://localhost:4000`));

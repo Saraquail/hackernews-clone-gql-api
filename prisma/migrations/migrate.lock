@@ -1,3 +1,7 @@
 # Prisma Migrate lockfile v1
 
 20200703154312-init
+20200703165024
+20200704122144-add-vote-model
+20200704163233-add-pub-model
+20200704163711-remove-pub-model
